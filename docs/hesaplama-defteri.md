@@ -1,4 +1,4 @@
-# Hesaplama Defteri — Wordle Türkçe: Şans mı, Beceri mi?
+# Hesaplama Defteri - Wordle Türkçe: Şans mı, Beceri mi?
 
 Bu doküman, [wordleturkce.bundle.app](https://wordleturkce.bundle.app/) için
 yapılan şans/beceri analizinin **adım adım hesap defteri**dir. Bütün sayılar
@@ -13,15 +13,15 @@ kendisi tekrar üretebilir.
 
 ---
 
-## Adım 0 — Soruyu netleştirme
+## Adım 0 - Soruyu netleştirme
 
 > *"Wordle'da kazanmanın yüzde kaçı şans, yüzde kaçı oyunu iyi bilmek?"*
 
 Bu soruyu cevaplamak için iki temel ölçüme ihtiyaç vardır:
 
-1. Bir **şans tabanı** — strateji uygulamayan bir oyuncunun ne kadar
+1. Bir **şans tabanı** - strateji uygulamayan bir oyuncunun ne kadar
    kazandığı.
-2. Bir **beceri tavanı** — en iyi stratejiyi uygulayan bir oyuncunun ne
+2. Bir **beceri tavanı** - en iyi stratejiyi uygulayan bir oyuncunun ne
    kadar kazandığı.
 
 Aradaki fark beceri payını verir; tavanın altında kalan ise indirgenemez
@@ -33,7 +33,7 @@ Aradaki fark beceri payını verir; tavanın altında kalan ise indirgenemez
 
 ---
 
-## Adım 1 — Oyunun veri tabanını çıkarma
+## Adım 1 - Oyunun veri tabanını çıkarma
 
 Sayfanın kaynak kodu (`https://wordleturkce.bundle.app/static/main.2023-04-23.js`)
 **iki JavaScript dizisi** içerir:
@@ -61,7 +61,7 @@ olarak diske kaydeder.
 
 ---
 
-## Adım 2 — Listeleri temizleme ve gerçek boyutları görme
+## Adım 2 - Listeleri temizleme ve gerçek boyutları görme
 
 Ham sayılar:
 
@@ -85,7 +85,7 @@ olarak da kullanılacaktır.
 
 ---
 
-## Adım 3 — Harf frekansı (`scripts/analyze.py`)
+## Adım 3 - Harf frekansı (`scripts/analyze.py`)
 
 11.470 günlük cevabın 5'er harfini sayıp ilk 15 harfin yüzdeleri:
 
@@ -116,11 +116,11 @@ kapsar.
 
 Bu desenden çıkan gözlem: tipik bir Türkçe Wordle cevabı **K-A-R-A-N** veya
 **S-A-L-İ-K** kalıbına benzer. Sessiz harfle başlayıp ünlü-sessiz-ünlü-sessiz
-ile biter — bu Türkçenin hece yapısının doğrudan yansımasıdır.
+ile biter - bu Türkçenin hece yapısının doğrudan yansımasıdır.
 
 ---
 
-## Adım 4 — Frekans skoru ile en iyi açılış
+## Adım 4 - Frekans skoru ile en iyi açılış
 
 Bir kelimenin **frekans skoru** tanımı:
 
@@ -146,12 +146,12 @@ karun   8.002
 **İlk bot için açılış kelimesi:** `salik` (skor 8.457).
 
 > Not: İnsan oyuncuların kullandığı klasik açılış kelimeleri (`KALEM`,
-> `TARİK`, `KIRAN`) zaten bu listenin en üstündedir — internette dolaşan
+> `TARİK`, `KIRAN`) zaten bu listenin en üstündedir - internette dolaşan
 > "iyi açılış" tavsiyeleri tam olarak bu frekans mantığının çıktısıdır.
 
 ---
 
-## Adım 5 — Üç oyuncu modeli (ilk yaklaşım)
+## Adım 5 - Üç oyuncu modeli (ilk yaklaşım)
 
 Şans/beceri ayrıştırması için üç oyuncu simüle edilir:
 
@@ -169,7 +169,7 @@ karun   8.002
 
 ---
 
-## Adım 6 — Renk geri bildirimi (kontrol)
+## Adım 6 - Renk geri bildirimi (kontrol)
 
 Wordle'ın standart kuralı (çift harf durumu dahil):
 
@@ -194,7 +194,7 @@ dağıtılır. Bu kural çift harfli kelimelerde (`anane`, `kakao` vs.) kritikti
 
 ---
 
-## Adım 7 — Simülasyon: 2.936 benzersiz cevap × 3 oyuncu
+## Adım 7 - Simülasyon: 2.936 benzersiz cevap × 3 oyuncu
 
 `scripts/simulate.py` çıktıları:
 
@@ -228,7 +228,7 @@ Stratejik seçim %99.18'e taşır ve ortalama tahmini 4.21 → 3.77'ye indirir.
 
 ---
 
-## Adım 8 — Eşleştirmeli karşılaştırma (ilk ayrıştırma)
+## Adım 8 - Eşleştirmeli karşılaştırma (ilk ayrıştırma)
 
 İki oyuncuyu aynı cevap üzerinde oynatınca (2.936 cevap):
 
@@ -248,7 +248,7 @@ Sadece rastgele kazanır :   22 / 2936  =   0.75%
 
 ---
 
-## Adım 9 — Çapraz kontrol: Bilgi teorisi
+## Adım 9 - Çapraz kontrol: Bilgi teorisi
 
 Cevap dağılımının **Shannon entropisi**:
 
@@ -271,7 +271,7 @@ gösterir.
 
 ---
 
-## Adım 10 — İlk sonucun zayıflıkları
+## Adım 10 - İlk sonucun zayıflıkları
 
 İlk yaklaşımın özeti: *frekans-botu vs tutarlı rastgele* tabanı altında
 **~%97 şans, ~%3 beceri**.
@@ -293,7 +293,7 @@ Aşağıdaki adımlar bunları sırasıyla düzeltir.
 
 ---
 
-## Adım 11 — Entropy-greedy bot (gerçek skill tavanı)
+## Adım 11 - Entropy-greedy bot (gerçek skill tavanı)
 
 `scripts/entropy_bot.py`, 3Blue1Brown'ın Wordle videosunda tanıttığı
 bilgi-teorisi tabanlı bir bot implementeder. Her turda, her olası tahmin `g`
@@ -344,14 +344,14 @@ Entropy-bot **hiç kaybetmez** ve ortalama 3.6 turda çözer. Frekans-botundan
 
 ---
 
-## Adım 12 — Vokabüler-kısıtlı insan tabanı
+## Adım 12 - Vokabüler-kısıtlı insan tabanı
 
 `scripts/human_baseline.py`, gerçekçi bir insan oyuncuyu modeller:
 
 - Sözlüğün tamamını bilmez; sadece **bilinen-vokabüler** içinden kelime
   söyleyebilir.
 - Vokabüler dışındaki bir kelime hâlâ aday olsa bile söyleyemez.
-- "Bilinen" tanımı: La listesindeki çoğaltı sayısı yaygınlık sinyalidir —
+- "Bilinen" tanımı: La listesindeki çoğaltı sayısı yaygınlık sinyalidir -
   bundle curator'ları zaten daha tanıdık kelimeleri daha sık cevap olarak
   koymuştur.
 
@@ -380,7 +380,7 @@ kazanma oranına** sahiptir. Bu, "şans tabanı" olarak çok daha gerçekçidir.
 
 ---
 
-## Adım 13 — Üç farklı tabana göre şans/beceri ayrıştırması
+## Adım 13 - Üç farklı tabana göre şans/beceri ayrıştırması
 
 Aynı entropy-bot kazanımları (%100), farklı tabanlara göre ayrıştırılınca:
 
@@ -392,7 +392,7 @@ Aynı entropy-bot kazanımları (%100), farklı tabanlara göre ayrıştırılı
 | İnsan (K=2000, ~%85 vokab.) | 67.13% | **%67.1** | **%32.9** |
 | Tutarlı rastgele (tam sözlük) | 96.97% | **%97.0** | **%3.0** |
 
-> **Net içgörü:** "Şans %X, beceri %Y" rakamı **tek değildir** — taban
+> **Net içgörü:** "Şans %X, beceri %Y" rakamı **tek değildir** - taban
 > seçimine tamamen bağlıdır. İlk yaklaşımın çıktısı (%97/%3) teknik olarak
 > doğrudur, ancak insanı tüm sözlüğü ezbere bilen biri olarak modellediği
 > için yanıltıcıdır.
@@ -414,7 +414,7 @@ katkıdır.
 
 ---
 
-## Adım 14 — Kelime-başına zorluk
+## Adım 14 - Kelime-başına zorluk
 
 Entropy-bot **kazanır** ama hangi kelimelerde zorlanır? `scripts/difficulty.py`
 her cevap için kaç turda çözüldüğünü hesaplar:
@@ -436,17 +436,17 @@ hazan, inanç, kapak, kaçak, kucak, pembe, siğil, yassı, yağma, çizgi, şeh
 şifon`.
 
 Bunların ortak özelliği: aynı kalıbı paylaşan birçok yakın komşu vardır
-(`KAPAK/KAÇAK/KAVAK/KAZAK` ailesi — sadece 3. harf değişiyor). Bot tek harf farklı tüm
+(`KAPAK/KAÇAK/KAVAK/KAZAK` ailesi - sadece 3. harf değişiyor). Bot tek harf farklı tüm
 varyantları tek tek denemek zorundadır; bu da fazladan 1-2 tur demektir.
 
-Bu, "puzzle zorluğunun yapısal kaynağı"dır — strateji ile değiştirilemeyen
+Bu, "puzzle zorluğunun yapısal kaynağı"dır - strateji ile değiştirilemeyen
 indirgenemez bir özellik. Günün cevabı bu ailelerden biriyse hem ortalama
 bir insan hem en iyi bot uzun sürer; aradaki fark yine de **sadece** strateji
 nedeniyle değildir.
 
 ---
 
-## Adım 15 — Görseller
+## Adım 15 - Görseller
 
 `scripts/difficulty.py` çalıştırıldığında dört grafik üretilir:
 

@@ -67,7 +67,7 @@ def plot_difficulty_histogram(rows: list[dict]):
             p.set_facecolor("#e08020")
     ax.set_xlabel("Entropy-bot tur sayısı (kazanırken)")
     ax.set_ylabel("Cevap sayısı")
-    ax.set_title("Wordle Türkçe — entropy-bot'un her kelimeyi kaç turda çözdüğü\n"
+    ax.set_title("Wordle Türkçe - entropy-bot'un her kelimeyi kaç turda çözdüğü\n"
                  f"({len(turns)} benzersiz cevap, %100 kazanma)")
     for i, p in enumerate(patches):
         h = counts[i]
@@ -107,7 +107,7 @@ def plot_turn_breakdown(sim: dict, ent: dict):
                 fontsize=10, fontweight="bold",
                 bbox=dict(facecolor="white", alpha=0.7, edgecolor="none"))
     axes[0].set_ylabel("Cevap sayısı")
-    fig.suptitle("Dört oyuncu modeli — 2936 benzersiz cevap üzerinde tur dağılımı")
+    fig.suptitle("Dört oyuncu modeli - 2936 benzersiz cevap üzerinde tur dağılımı")
     fig.tight_layout()
     fig.savefig(FIG / "turn_breakdown.png", dpi=150)
     plt.close(fig)

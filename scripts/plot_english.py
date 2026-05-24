@@ -53,7 +53,7 @@ def plot_difficulty_histogram(ent):
     ax.set_xlabel("Turns taken by entropy bot (winning games)")
     ax.set_ylabel("Number of answer words")
     ax.set_title(
-        "Turkish Wordle — turns the entropy bot needs per word\n"
+        "Turkish Wordle - turns the entropy bot needs per word\n"
         f"({len(turns)} unique answers, 100% win rate)"
     )
     for i, p in enumerate(patches):
@@ -97,7 +97,7 @@ def plot_turn_breakdown(sim, ent):
             bbox=dict(facecolor="white", alpha=0.7, edgecolor="none"),
         )
     axes[0].set_ylabel("Number of answer words")
-    fig.suptitle("Four player models — turn distribution over 2,936 unique answers")
+    fig.suptitle("Four player models - turn distribution over 2,936 unique answers")
     fig.tight_layout()
     out = PAPER_FIG / "turn_breakdown.png"
     fig.savefig(out, dpi=150)
