@@ -1,0 +1,76 @@
+{
+  "opening_word": "salik",
+  "opening_score": 8457,
+  "counts": {
+    "answers_weighted": 11470,
+    "unique_answers": 2936,
+    "dictionary_unique": 5500
+  },
+  "uniform_sample": {
+    "sample_size": 2936,
+    "pure_random": {
+      "name": "1) Saf rastgele (geri bildirim yok)",
+      "sample": 2936,
+      "wins": 3,
+      "win_rate": 0.0010217983651226157,
+      "avg_guesses_when_won": 4.333333333333333,
+      "histogram": {
+        "0": 2933,
+        "1": 1,
+        "6": 2
+      },
+      "seconds": 0.01931285858154297
+    },
+    "consistent_random": {
+      "name": "2) Tutarli rastgele (kurallara uyan)",
+      "sample": 2936,
+      "wins": 2847,
+      "win_rate": 0.9696866485013624,
+      "avg_guesses_when_won": 4.208991921320688,
+      "histogram": {
+        "0": 89,
+        "1": 2,
+        "2": 94,
+        "3": 600,
+        "4": 1029,
+        "5": 855,
+        "6": 267
+      },
+      "seconds": 10.60469102859497
+    },
+    "frequency_bot": {
+      "name": "3) Frekans tabanli bot",
+      "sample": 2936,
+      "wins": 2912,
+      "win_rate": 0.9918256130790191,
+      "avg_guesses_when_won": 3.766826923076923,
+      "histogram": {
+        "0": 24,
+        "1": 1,
+        "2": 147,
+        "3": 1011,
+        "4": 1222,
+        "5": 433,
+        "6": 98
+      },
+      "seconds": 9.741886854171753
+    }
+  },
+  "weighted_daily_distribution": {
+    "frequency_bot": {
+      "days": 11470,
+      "wins": 11369,
+      "win_rate": 0.9911944202266783,
+      "avg_guesses_when_won": 3.764007388512622,
+      "histogram": {
+        "0": 101,
+        "1": 6,
+        "2": 567,
+        "3": 3948,
+        "4": 4796,
+        "5": 1687,
+        "6": 365
+      }
+    }
+  }
+}

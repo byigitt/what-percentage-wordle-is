@@ -1,0 +1,11 @@
+{
+  "both_win": 2825,
+  "only_skill_wins": 87,
+  "only_random_wins": 22,
+  "neither_wins": 2,
+  "total": 2936,
+  "bot_total_wins": 2912,
+  "random_total_wins": 2847,
+  "luck_share_of_bot_wins": 0.9701236263736264,
+  "skill_share_of_bot_wins": 0.029876373626373628
+}
