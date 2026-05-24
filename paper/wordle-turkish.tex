@@ -1,0 +1,619 @@
+\documentclass[conference]{IEEEtran}
+\IEEEoverridecommandlockouts
+
+\usepackage{cite}
+\usepackage{amsmath,amssymb,amsfonts}
+\usepackage{algorithmic}
+\usepackage{graphicx}
+\usepackage{textcomp}
+\usepackage{xcolor}
+\usepackage{booktabs}
+\usepackage{url}
+\usepackage[T1]{fontenc}
+\usepackage{balance}
+\usepackage{hyperref}
+\hypersetup{
+    colorlinks=true,
+    linkcolor=black,
+    urlcolor=blue,
+    citecolor=black,
+}
+
+\def\BibTeX{{\rm B\kern-.05em{\sc i\kern-.025em b}\kern-.08em
+    T\kern-.1667em\lower.7ex\hbox{E}\kern-.125emX}}
+
+\begin{document}
+
+\title{How Much of Turkish Wordle Is Luck? \\
+A Multi-Baseline Skill/Luck Split Using Letter Frequency
+and Information Theory}
+
+\author{\IEEEauthorblockN{Bar\i{}\c{s} Cem Bayburtlu}
+\IEEEauthorblockA{
+\textit{Department of Software Engineering} \\
+\textit{\c{C}ankaya University} \\
+Ankara, Turkey \\
+c2228009@student.cankaya.edu.tr
+\thanks{Source code, data, and figures are available at
+\url{https://github.com/byigitt/what-percentage-wordle-is}.}
+}
+}
+
+\maketitle
+
+\begin{abstract}
+We try to measure how much of winning at Turkish Wordle
+(\textit{wordleturkce.bundle.app}) is luck and how much is skill. To
+do this we first pull the full word lists out of the live site: 2{,}936
+unique answer words and 5{,}500 valid guesses. We then run four player
+models against every puzzle in the pool. A simple player that only
+follows the colored feedback (green, yellow, gray), with no strategy at
+all, already wins $96.97\%$ of the games. The reason is that the
+feedback alone leaks a lot of information. But this player is also
+assumed to know every word in the dictionary, and that is not realistic
+for a human. To fix this we add two more models. The first is an
+entropy-greedy bot in the style of the \textit{3Blue1Brown} lesson; it
+wins every puzzle and uses $3.59$ guesses on average. The second is a
+human-like player who only knows the top $K$ most common words, ranked
+by how often the bundle picks each word as the daily answer. With
+$K{=}1000$ (around $48\%$ of daily puzzles), the split is about $34\%$
+luck and $66\%$ skill. Inside that $66\%$, vocabulary alone explains
+about $95\%$ and strategy adds the rest (about $5\%$). We also report
+the split for four other baselines. The headline number moves from
+$0.1\%$ to $97\%$ depending on which baseline we choose. All code, data,
+and figures are open source.
+\end{abstract}
+
+\begin{IEEEkeywords}
+Wordle, information theory, Shannon entropy, Turkish language, word games,
+skill versus luck, simulation, computational linguistics
+\end{IEEEkeywords}
+
+\section{Introduction}
+
+Wordle was made by Josh Wardle in 2021 and bought by The New York Times
+in 2022. The player has six tries to guess a five-letter word. After
+each guess the game gives back one color per position: green (right
+letter, right place), yellow (right letter, wrong place), or gray
+(letter not in the word, with a small extra rule for repeated letters).
+The game got very popular and many local versions came out, including
+the Turkish-language \textit{wordleturkce.bundle.app}, which uses its
+own list of Turkish five-letter words.
+
+Players often ask: how much of winning is luck (the daily word happened
+to be easy) and how much is skill (the player picked smart guesses)?
+This is a fair question, but it is not so well defined.  ``Luck''
+only has a clear meaning once we say what ``no skill'' would look like.
+This paper answers the question with numbers for the Turkish version.
+We do five things:
+
+\begin{enumerate}
+\item Pull the full answer pool and guess dictionary out of the shipped
+JavaScript bundle (Section~\ref{sec:data});
+\item Build four player models, from random to information-theoretic
+optimal (Sections~\ref{sec:models}, \ref{sec:entropy});
+\item Add a human-like player whose vocabulary is limited to the top
+$K$ most common words (Section~\ref{sec:human});
+\item Compute the skill/luck split under five baselines and show how
+much the answer changes (Section~\ref{sec:decomposition}); and
+\item Look at per-word difficulty and the words that even the best bot
+finds hard (Section~\ref{sec:difficulty}).
+\end{enumerate}
+
+The main result: under a realistic human baseline, Turkish Wordle wins
+are about $34\%$ luck and $66\%$ skill, and most of that skill (around
+$95\%$) is vocabulary, not strategy. This goes against the common view
+that picking the right opener is the most important thing.
+
+\section{Related Work}
+
+Wordle solvers got a lot of attention soon after the game came out.
+Sanderson's video~\cite{3b1b_wordle} made the entropy-greedy approach
+widely known. It uses Shannon's information theory~\cite{shannon1948}:
+each turn the player picks the guess with the highest expected
+information gain, $H(g \mid C) = -\sum_p P(p \mid g, C) \log_2 P(p \mid g, C)$.
+Later work showed that the truly optimal English bot needs about
+$3.42$ guesses on average and wins every game by doing full game-tree
+search~\cite{bertsimas2022wordle}. A recent peer-reviewed paper by
+Aladaileh et al.~\cite{aladaileh2026wordle} confirms again that entropy
+beats simple letter-distribution heuristics on English Wordle.
+
+For Turkish Wordle, Akbulut and Senturk~\cite{akbulut2026turkish}
+already did the first careful comparison of LSTM, MaxEnt, and
+rule-based solvers on $1{,}000$ Turkish target words. They report that
+linguistic features---dense CVCVC templates and low lexical
+frequencies in particular---predict how hard a word is. Our paper goes
+in a different direction. We do not compare solvers; we look at the
+luck/skill split. We also use the full $2{,}936$-word solution pool
+instead of a sample of $1{,}000$, and we add a human player with a
+limited vocabulary.
+
+The vocabulary-limited idea has a close relative in the HSW model of
+Qiu and Zhong~\cite{qiu2024hsw}, who use a vocabulary-population (VP)
+component based on a normal-distribution assumption to simulate
+heterogeneous English players. Our model is different: we do not assume
+any distribution. Instead we rank words by how often the deployed
+bundle picks them as the daily answer.
+
+For games in general, the skill-vs-luck question has been studied more
+formally. The most rigorous work is on poker~\cite{poker_luck}, which
+uses a predictive-likelihood argument. We follow a simpler
+counterfactual idea from Mauboussin~\cite{mauboussin2012success}: a
+game outcome counts as skill if the skilled agent wins where the
+baseline agent would lose, and as luck if both win or both lose. For
+English Wordle, Dilger~\cite{dilger2023wordle} applies information
+theory to a large sample of player data and uses the share of
+one-guess solves to estimate a cheating rate. Our work is different:
+we report the skill/luck split under several human baselines, not a
+single score against one bot.
+
+We are not aware of earlier work that gives a multi-baseline skill/luck
+split for Wordle in any language together with a vocabulary-limited
+human model built from real data. Turkish has its own structure: it
+is agglutinative and prefers CVCVC syllables, so the letter and
+position counts are not the same as English. This matters for opener
+choice and for which words turn out to be hard.
+
+\section{Data and Methodology}
+\label{sec:data}
+
+\subsection{Word Lists}
+
+The game runs fully in the browser. The whole word list ships inside
+one JavaScript file at
+\url{https://wordleturkce.bundle.app/static/main.2023-04-23.js}. We
+find two arrays in it:
+
+\begin{itemize}
+\item \texttt{La}: 11{,}470 entries, but only 2{,}936 unique. The daily
+answer is $La[i \bmod 11470]$, where $i$ is the day index. The same
+word can appear many times---for example \texttt{buruk} and
+\texttt{selam} each appear 8 times, while rare words appear once. We
+read this repetition as a commonality signal: the curator made
+common words more likely to be the daily answer.
+\item \texttt{Ta}: 5{,}531 entries, 5{,}499 unique. These count as
+valid guesses but never appear as the answer.
+\end{itemize}
+
+After we drop duplicates, the full guess dictionary has 5{,}500 unique
+words. The daily answer comes from the 2{,}936 unique solutions, with
+the $La$ multiplicities used as weights.
+
+\subsection{Feedback Function}
+
+We implement the standard Wordle feedback rule, including the case
+with repeated letters. It is a deterministic function
+$\mathrm{feedback}: \Sigma^5 \times \Sigma^5 \to \{0,1,2\}^5$, where
+0, 1, and 2 stand for gray, yellow, and green. We assign greens first.
+Then we walk through the non-green positions of the guess from left to
+right and mark a yellow when the answer still has an unmatched copy of
+that letter. We encode each five-cell pattern as a base-3 integer in
+$[0, 242]$ so that we can index it directly.
+
+\subsection{Letter Frequency Analysis}
+
+Over the weighted 11{,}470-entry solution distribution, the five most
+common letters are A ($13.04\%$), E ($8.52\%$), \.I ($6.90\%$),
+K ($6.81\%$), and R ($6.09\%$). Together they cover $41\%$ of all
+letter occurrences. By position:
+
+\begin{table}[h]
+\centering
+\caption{Most frequent letters by position (top 5 each).}
+\label{tab:positional}
+\begin{tabular}{cl}
+\toprule
+Position & Top 5 letters (with counts) \\
+\midrule
+1 & K (1336), S (1121), T (841), B (751), M (714) \\
+2 & A (3199), E (1881), \.I (1142), O (938), U (782) \\
+3 & R (1435), L (1183), K (799), N (757), M (747) \\
+4 & A (2308), \.I (1587), E (1530), I (868), U (843) \\
+5 & K (1367), N (1189), R (1070), A (1052), E (971) \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+This pattern matches Turkish phonotactics. Turkish words use a
+canonical $(C)V(C)$ syllable template~\cite{goksel2005turkish}, and
+CVCVC is one of the most common five-letter shapes. Vowels are mostly
+in positions 2 and 4 and consonants in positions 1, 3, and 5.
+
+\section{Player Models}
+\label{sec:models}
+
+We use four player models. All of them follow the standard rules: up
+to six guesses, and each guess must be a valid five-letter word from
+the dictionary.
+
+\subsection{Pure Random ($\mathcal{P}_{\mathrm{rand}}$)}
+At each turn this player picks a random word from the 5{,}500-word
+dictionary and ignores all feedback. This is the zero-information
+baseline. The expected win rate in six guesses is
+$1 - (1 - 1/5500)^6 \approx 0.109\%$.
+
+\subsection{Consistent Random ($\mathcal{P}_{\mathrm{cons}}$)}
+This player keeps the set of candidates that are still consistent with
+the feedback so far. At each turn it picks a random word from that
+set. It follows the rules perfectly but uses no strategy beyond that.
+
+\subsection{Frequency Bot ($\mathcal{P}_{\mathrm{freq}}$)}
+At each turn this bot recomputes positional letter frequencies on the
+current candidate set. Each candidate $w$ gets a score
+$\mathrm{score}(w) = \sum_i \mathbb{1}[w[i] \notin w[0{:}i]] \cdot
+\mathrm{posfreq}[i, w[i]]$, which sums the contributions of the
+\emph{distinct} letters only. The bot picks the candidate with the
+highest score.
+
+\subsection{Vocabulary-Limited Human ($\mathcal{P}_{\mathrm{hum}, K}$)}
+\label{sec:human}
+This model represents a casual human player by a vocabulary size $K$.
+We rank words by how often \texttt{La} repeats them (the commonality
+proxy), and break ties alphabetically. The top $K$ are the player's
+vocabulary. At each turn, the player picks a random word from the
+intersection of the remaining candidates and the vocabulary. If that
+intersection is empty, the player picks a random word from the
+vocabulary as a forced ``probe'' guess.
+
+\section{Entropy-Greedy Bot}
+\label{sec:entropy}
+
+To get a tight skill ceiling we add an entropy-greedy bot
+$\mathcal{P}_{\mathrm{ent}}$ in the style of \cite{3b1b_wordle}. For a
+guess $g$ and candidate set $C$, the partition that $g$ creates on $C$
+is $\{C_p : p \in \{0,\ldots,242\}\}$ where
+$C_p = \{a \in C : \mathrm{feedback}(g,a) = p\}$. The expected
+information gain is the entropy of this partition:
+\begin{equation}
+H(g \mid C) = -\sum_{p} \frac{|C_p|}{|C|} \log_2 \frac{|C_p|}{|C|}.
+\end{equation}
+The bot picks $g^\star = \arg\max_g H(g \mid C)$ and, when several
+guesses are tied, prefers a guess that is itself in $C$.
+
+\subsection{Implementation}
+
+A direct implementation needs $O(|G| \cdot |C|)$ feedback evaluations
+per turn, which is too slow when we simulate thousands of puzzles. To
+speed this up we precompute a pattern matrix
+$M \in \{0,\ldots,242\}^{|G| \times |A|}$ once. We store the encoded
+feedback for every guess--answer pair as a \texttt{uint8}. The matrix
+takes about $8\,$MB and is built in about $0.5\,$s using vectorized
+NumPy~\cite{harris2020numpy} operations that work in parallel over
+letters.
+
+To check the fast feedback function we compared it with a plain Python
+reference on $5{,}000$ random word pairs. We found 0 mismatches.
+
+\subsection{Results}
+
+The best entropy opener is \texttt{merak} with $H = 5.81$ bits. The ten
+best openers by entropy are \texttt{merak, kenar, kamer, kelam, kalem,
+malik, karne, katre, keman, karni}. Interesting note: mid-frequency
+liquid consonants (R, L, N, M) win over the much more frequent letter
+A, which dominated the frequency-score top picks.
+
+On all 2{,}936 puzzles, the entropy bot wins
+\textbf{$100.00\%$} of the time, with $3.59$ guesses on average. It
+never reaches turn six. The turn histogram is
+$\{1: 1, 2: 84, 3: 1221, 4: 1455, 5: 175\}$.
+
+\section{Simulation Results}
+\label{sec:results}
+
+\begin{table}[t]
+\centering
+\caption{Performance of all four player models on the 2{,}936-word
+solution pool (uniform sampling).}
+\label{tab:players}
+\begin{tabular}{lrrr}
+\toprule
+Player & Win rate & Avg.\ guesses & Opener \\
+\midrule
+$\mathcal{P}_{\mathrm{rand}}$ (pure random) & 0.10\% & 4.33 & --- \\
+$\mathcal{P}_{\mathrm{hum},1000}$ (K=1000) & 33.92\% & 3.84 & --- \\
+$\mathcal{P}_{\mathrm{cons}}$ (consistent) & 96.97\% & 4.21 & --- \\
+$\mathcal{P}_{\mathrm{freq}}$ (frequency) & 99.18\% & 3.77 & \texttt{salik} \\
+$\mathcal{P}_{\mathrm{ent}}$ (entropy) & \textbf{100.00\%} & \textbf{3.59} & \texttt{merak} \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+Table~\ref{tab:players} shows the main numbers. Fig.~\ref{fig:turns}
+shows the turn distribution for each model. The most surprising thing
+is the gap between $\mathcal{P}_{\mathrm{rand}}$ ($0.1\%$) and
+$\mathcal{P}_{\mathrm{cons}}$ ($96.97\%$). If you just follow the
+feedback properly, you already get almost the whole win rate. Strategy
+on top of that only adds a small amount.
+
+\begin{figure}[t]
+\centering
+\includegraphics[width=\columnwidth]{figures/turn_breakdown.png}
+\caption{Turn counts for the four player models on 2{,}936 puzzles.
+Pure random almost always runs out of guesses. Consistent random and
+the frequency bot have long tails. The entropy bot is tightly grouped
+and never goes past five guesses.}
+\label{fig:turns}
+\end{figure}
+
+\subsection{Vocabulary Sensitivity}
+
+\begin{table}[t]
+\centering
+\caption{Win rates of the vocabulary-limited human model and the
+share of daily puzzles its vocabulary covers, as a function of $K$.}
+\label{tab:human}
+\begin{tabular}{rrrr}
+\toprule
+$K$ & Uniform win \% & Weighted win \% & Coverage \% \\
+\midrule
+200  & 6.81  & 10.92 & 10.92 \\
+500  & 17.00 & 25.74 & 25.79 \\
+1000 & 33.92 & 47.39 & 47.59 \\
+1500 & 50.72 & 67.00 & 67.50 \\
+2000 & 67.13 & 83.68 & 84.93 \\
+2500 & 83.58 & 94.46 & 96.20 \\
+2936 & 97.21 & 97.20 & 100.00 \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+Table~\ref{tab:human} and Fig.~\ref{fig:k} show how the win rate
+depends on the vocabulary size $K$. The empirical fit
+\begin{equation}
+P(\mathrm{win} \mid K) \approx \mathrm{coverage}(K) \cdot 0.97
+\label{eq:vocab}
+\end{equation}
+holds for every $K$ we tested, within sampling noise. Equation
+\ref{eq:vocab} says a simple thing: \emph{knowing the word is almost
+necessary and sufficient to win}. If the day's word is in the player's
+vocabulary, consistent-random play wins with probability about $0.97$.
+Otherwise the player loses.
+
+\begin{figure}[t]
+\centering
+\includegraphics[width=\columnwidth]{figures/k_vs_winrate.png}
+\caption{Win rate of the vocabulary-limited human model as a function
+of vocabulary size $K$. The weighted curve is almost identical to the
+vocabulary coverage curve, which matches Eq.~\ref{eq:vocab}. The
+shaded band is the plausible range for typical casual players.}
+\label{fig:k}
+\end{figure}
+
+\section{Skill/Luck Decomposition}
+\label{sec:decomposition}
+
+We use a counterfactual decomposition. The entropy bot's wins count as
+\emph{luck} when the baseline player would have won too, and as
+\emph{skill} when the baseline player would have lost. For a baseline
+$\mathcal{P}_b$ with win rate $w_b$ and a ceiling
+$\mathcal{P}_{\mathrm{ent}}$ with win rate $w_c = 1$, the luck share is
+$w_b / w_c$ and the skill share is $(w_c - w_b) / w_c$.
+
+\begin{table}[t]
+\centering
+\caption{Skill/luck split under five different baselines. The result
+changes by almost two orders of magnitude.}
+\label{tab:decomp}
+\begin{tabular}{lrrr}
+\toprule
+Baseline $\mathcal{P}_b$ & $w_b$ & Luck \% & Skill \% \\
+\midrule
+Pure random              & 0.10\%  & 0.1\%  & 99.9\% \\
+Human ($K{=}500$)        & 17.00\% & 17.0\% & 83.0\% \\
+\textbf{Human ($K{=}1000$)} & \textbf{33.92\%} & \textbf{33.9\%} & \textbf{66.1\%} \\
+Human ($K{=}2000$)       & 67.13\% & 67.1\% & 32.9\% \\
+Consistent random        & 96.97\% & 97.0\% & 3.0\%  \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+Table~\ref{tab:decomp} and Fig.~\ref{fig:decomp} show the split. The
+headline answer depends entirely on the baseline we pick. We argue
+that the most realistic baseline for an average human is
+$\mathcal{P}_{\mathrm{hum},K \approx 1000}$, since informal estimates
+put active Turkish five-letter vocabulary around this size for casual
+players. Under this baseline,
+\textbf{$\approx{}66\%$ of Turkish Wordle wins come from skill and
+$\approx{}34\%$ come from luck.}
+
+\begin{figure}[t]
+\centering
+\includegraphics[width=\columnwidth]{figures/skill_decomposition.png}
+\caption{Skill and luck shares of entropy-bot wins under five
+baselines. The answer to ``how much of Wordle is luck'' moves from
+$0.1\%$ to $97\%$ just based on which baseline we pick.}
+\label{fig:decomp}
+\end{figure}
+
+\subsection{Skill is Mostly Vocabulary}
+
+Equation~\ref{eq:vocab} also tells us that the skill share itself
+splits into two parts. Going from $\mathcal{P}_{\mathrm{hum},1000}$ to
+$\mathcal{P}_{\mathrm{cons}}$ (perfect vocabulary, no strategy) adds 63
+points of win rate ($33.92\%$ to $96.97\%$). Going from
+$\mathcal{P}_{\mathrm{cons}}$ to $\mathcal{P}_{\mathrm{ent}}$ (strategy
+on top of perfect vocabulary) adds only 3 points more ($96.97\%$ to
+$100.00\%$). So out of the 66-point skill gap, vocabulary explains
+about $95\%$ and strategic word selection explains about $5\%$.
+
+This goes against the usual story in popular Wordle posts, which
+focuses on opener choice and information-theoretic optimization. Our
+result suggests that \emph{lexical knowledge} matters much more than
+strategic sophistication for who wins more often.
+
+\section{Per-Word Difficulty}
+\label{sec:difficulty}
+
+Fig.~\ref{fig:diff} shows how many turns the entropy bot needs to
+solve each of the 2{,}936 puzzles. The most common turn count is 4.
+The bot never reaches turn 6. The puzzles that take 5 turns (175 words)
+are the structurally hardest ones.
+
+\begin{figure}[t]
+\centering
+\includegraphics[width=\columnwidth]{figures/difficulty_hist.png}
+\caption{Turn counts of the entropy-greedy bot on all 2{,}936
+solutions. No puzzle needs 6 turns; the hardest 175 take 5.}
+\label{fig:diff}
+\end{figure}
+
+When we look inside the 5-turn group we see a common pattern: large
+families of look-alike words that differ in only one position, for
+example \texttt{KAPAK / KAÇAK / KAVAK / KAZAK}. Once the candidate set
+shrinks to such a family, even an optimal bot has to test the
+remaining words one by one because each guess tells it about one
+position only. This is an irreducible source of variance. No
+strategy can remove it, and an ideal human would face the same
+problem.
+
+This kind of luck is \emph{structural}, and is different from the
+player-level luck we measured earlier. Even a perfect-information
+player has to spend more turns when the day's word lives in a dense
+look-alike family.
+
+\section{Discussion}
+\label{sec:discussion}
+
+\subsection{Definitional Sensitivity}
+
+The main methodological point of this work is that the popular
+``$X\%$ luck, $Y\%$ skill'' framing is not well defined without a
+baseline. The same data, looked at under five reasonable baselines,
+gives skill shares anywhere between $3\%$ and $99.9\%$. We therefore
+think single-number claims of this kind should be avoided in both
+popular and academic discussion of game design.
+
+\subsection{Vocabulary as the Dominant Skill}
+
+The near-identity between vocabulary coverage and win rate
+(Eq.~\ref{eq:vocab}) points to a finding that we think has not been
+discussed enough: Wordle is mostly a vocabulary test. Strategy helps,
+but only a little. A player who wants a higher win rate is better off
+learning more words than switching to a fancier opening word. This
+matches independent observational work by Liang et
+al.~\cite{liang2024biases}, who show that real Wordle players narrow
+candidates using semantic, orthographic, and morphological
+similarities, not information-theoretic optimality.
+
+\subsection{Information-Theoretic Bound}
+
+The Shannon entropy of the weighted daily distribution is 11.36 bits.
+The theoretical ceiling per guess is $\log_2 243 = 7.92$ bits. The
+entropy bot pulls out about $3.16$ bits per guess on average (the
+same as needing $3.59$ guesses to remove $11.36$ bits of
+uncertainty). That is around $40\%$ of the per-guess ceiling. The gap
+has two sources: (i) the greedy choice is not the same as full
+lookahead, and (ii) every guess must be a real word, not just any
+five-character string.
+
+\subsection{Limitations}
+
+The vocabulary model uses bundle multiplicity as a proxy for
+commonality. A more rigorous human model would calibrate against an
+external Turkish corpus and would also include imperfect feedback
+tracking, especially for words with repeated letters. Stronger
+solver models, such as the Bertsimas--Paskov-style full-tree
+search~\cite{bertsimas2022wordle}, would push the skill ceiling a tiny
+bit higher but would not change the overall split.
+
+\section{Conclusion}
+
+We have presented a multi-baseline analysis of skill versus luck in
+Turkish Wordle, built on a full extraction of the deployed game's
+solution and dictionary lists. Four player models were simulated on
+all 2{,}936 puzzles: the entropy-greedy ceiling wins every game, while
+a realistic vocabulary-limited human (K=1000) wins about $34\%$.
+Under this baseline, the skill share of wins is about $66\%$, and
+about $95\%$ of that is vocabulary while only about $5\%$ is strategy.
+We stress that the headline split is very sensitive to the baseline
+and we report a five-baseline table to back up this point.
+
+All code, simulation outputs, intermediate data, and reproduction
+steps are available as open source at the project repository.
+
+\section*{Reproducibility}
+
+The source code, the extracted word lists, and the full simulation
+outputs are released under a permissive license at the project's
+open-source repository. The whole pipeline runs end-to-end in under
+three minutes on a normal laptop, using only
+NumPy~\cite{harris2020numpy} and Matplotlib~\cite{hunter2007matplotlib}.
+
+\balance
+\begin{thebibliography}{00}
+
+\bibitem{shannon1948}
+C.~E.~Shannon, ``A mathematical theory of communication,''
+\textit{Bell System Technical Journal}, vol.~27, no.~3, pp.~379--423, 1948.
+
+\bibitem{3b1b_wordle}
+G.~Sanderson (3Blue1Brown), ``Solving Wordle using information theory,''
+YouTube video, 2022.\\
+\url{https://www.youtube.com/watch?v=v68zYyaEmEA}
+
+\bibitem{bertsimas2022wordle}
+D.~Bertsimas and A.~Paskov,
+``An Exact Solution to Wordle,''
+\textit{Operations Research}, vol.~73, no.~3, pp.~1384--1394, 2025.
+
+\bibitem{mauboussin2012success}
+M.~J.~Mauboussin, \textit{The Success Equation: Untangling Skill and
+Luck in Business, Sports, and Investing}. Harvard Business Review Press,
+2012.
+
+\bibitem{poker_luck}
+S.~D.~Levitt and T.~J.~Miles, ``The Role of Skill Versus Luck in Poker:
+Evidence from the World Series of Poker,''
+\textit{Journal of Sports Economics}, vol.~15, no.~1, pp.~31--44, 2014.
+
+\bibitem{wordle_nyt}
+J.~Wardle, ``Wordle,'' originally published 2021;
+\url{https://www.nytimes.com/games/wordle/index.html}.
+
+\bibitem{wordleturkce}
+``Wordle Türkçe,'' \url{https://wordleturkce.bundle.app/}, accessed 2026.
+
+\bibitem{aladaileh2026wordle}
+T.~Aladaileh, D.~Stephens, M.~Alqaisi, and C.~Wu,
+``Solving Wordle Using Information Theory,''
+\textit{Northeast Journal of Complex Systems}, vol.~8, no.~1, art.~6, 2026.\\
+\url{https://orb.binghamton.edu/nejcs/vol8/iss1/6/}
+
+\bibitem{harris2020numpy}
+C.~R.~Harris \textit{et al.}, ``Array programming with NumPy,''
+\textit{Nature}, vol.~585, no.~7825, pp.~357--362, 2020.
+
+\bibitem{hunter2007matplotlib}
+J.~D.~Hunter, ``Matplotlib: A 2D graphics environment,''
+\textit{Computing in Science \& Engineering}, vol.~9, no.~3, pp.~90--95,
+2007.
+
+\bibitem{liang2024biases}
+G.~Liang, A.~Kabbara, C.~Liu, R.~Luo, K.~Kim, and M.~Guerzhoy,
+``Semantic, Orthographic, and Phonological Biases in Humans' Wordle
+Gameplay,'' arXiv preprint arXiv:2411.18634, 2024.\\
+\url{https://arxiv.org/abs/2411.18634}
+
+\bibitem{goksel2005turkish}
+A.~Göksel and C.~Kerslake,
+\textit{Turkish: A Comprehensive Grammar}. London: Routledge, 2005.
+
+\bibitem{akbulut2026turkish}
+S.~Akbulut and \.{I}.~F.~Senturk, ``An analytical study of artificial
+intelligence methods in the Turkish Wordle game: LSTM, entropy, and
+rule-based approaches,'' \textit{Entertainment Computing}, vol.~57,
+art.~101117, May 2026, doi: 10.1016/j.entcom.2026.101117.
+
+\bibitem{qiu2024hsw}
+T.~Qiu and Y.~Zhong, ``Simulation and analysis of Wordle based on the HSW
+model,'' in \textit{Frontiers in Artificial Intelligence and Applications},
+vol.~376, IOS Press, 2024, pp.~167--174.
+
+\bibitem{dilger2023wordle}
+J.~P.~Dilger, ``Wordle: A microcosm of life. Luck, skill, cheating,
+loyalty, and influence!'' arXiv preprint arXiv:2309.02110, 2023.\\
+\url{https://arxiv.org/abs/2309.02110}
+
+\end{thebibliography}
+
+\end{document}
