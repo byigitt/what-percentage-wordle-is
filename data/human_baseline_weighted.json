@@ -1,0 +1,44 @@
+[
+  {
+    "k": 200,
+    "uniform_win_rate": 0.0681198910081744,
+    "weighted_win_rate": 0.1092414995640802,
+    "coverage": 0.1092414995640802
+  },
+  {
+    "k": 500,
+    "uniform_win_rate": 0.1699591280653951,
+    "weighted_win_rate": 0.25736704446381864,
+    "coverage": 0.2578901482127289
+  },
+  {
+    "k": 1000,
+    "uniform_win_rate": 0.33923705722070846,
+    "weighted_win_rate": 0.4739319965126417,
+    "coverage": 0.4758500435919791
+  },
+  {
+    "k": 1500,
+    "uniform_win_rate": 0.5071525885558583,
+    "weighted_win_rate": 0.6700087183958152,
+    "coverage": 0.674978204010462
+  },
+  {
+    "k": 2000,
+    "uniform_win_rate": 0.6713215258855586,
+    "weighted_win_rate": 0.8367916303400175,
+    "coverage": 0.8493461203138623
+  },
+  {
+    "k": 2500,
+    "uniform_win_rate": 0.8358310626702997,
+    "weighted_win_rate": 0.9445510026155187,
+    "coverage": 0.9619877942458588
+  },
+  {
+    "k": 2936,
+    "uniform_win_rate": 0.9720708446866485,
+    "weighted_win_rate": 0.9720139494333043,
+    "coverage": 1.0
+  }
+]
