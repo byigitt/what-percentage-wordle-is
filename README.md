@@ -27,7 +27,7 @@ küçük bir kısmı (~%3) **strateji** (frekans/entropy mantığı).
 |---|---|
 | 📄 [`docs/sonuc.md`](docs/sonuc.md) | Özet doküman - final cümlesi hazır |
 | 📓 [`docs/hesaplama-defteri.md`](docs/hesaplama-defteri.md) | Adım adım hesap defteri (15 adım) |
-| 📚 [`paper/wordle-turkish.pdf`](paper/wordle-turkish.pdf) | IEEE format akademik makale (5 sayfa, İngilizce) |
+| 📚 [`paper/WhatPercentageWordleIsLuck.pdf`](paper/WhatPercentageWordleIsLuck.pdf) | IEEE format akademik makale (5 sayfa, İngilizce) |
 
 > Yazarın özel video script'i, indirilmiş Unsplash fotoğrafları ve Manim
 > animasyonları `script/` klasöründedir; bu klasör `.gitignore` içinde olduğu
@@ -64,8 +64,8 @@ docs/
   sonuc.md                  özet doküman
   hesaplama-defteri.md      adım adım hesap defteri
 paper/
-  wordle-turkish.tex        IEEE LaTeX kaynağı
-  wordle-turkish.pdf        derlenmiş PDF (IEEE conference format)
+  WhatPercentageWordleIsLuck.tex  IEEE LaTeX kaynağı
+  WhatPercentageWordleIsLuck.pdf  derlenmiş PDF (IEEE conference format)
   Makefile                  tectonic ile tek komutluk derleme
   figures/                  İngilizce-etiketli grafikler (plot_english.py üretir)
 scripts/

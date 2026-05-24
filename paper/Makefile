@@ -4,8 +4,8 @@
 #   - tectonic   (brew install tectonic)
 #   - data/figures/*.png mevcut olmali (../scripts/difficulty.py uretir)
 
-PDF := wordle-turkish.pdf
-TEX := wordle-turkish.tex
+PDF := WhatPercentageWordleIsLuck.pdf
+TEX := WhatPercentageWordleIsLuck.tex
 FIGS := figures/turn_breakdown.png figures/skill_decomposition.png \
         figures/k_vs_winrate.png figures/difficulty_hist.png
 

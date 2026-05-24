@@ -4,10 +4,10 @@ Bu klasör, projenin akademik makaleleştirilmiş hâlini içerir.
 
 ## Dosyalar
 
-- `wordle-turkish.tex` — IEEEtran format LaTeX kaynağı (İngilizce, conference template)
-- `wordle-turkish.pdf` — Derlenmiş PDF (5 sayfa)
-- `figures/` — İngilizce-etiketli PNG grafikler (`../scripts/plot_english.py` üretir; Türkçe versiyonlar `data/figures/` altında, docs/ için)
-- `Makefile` — Tek komutluk derleme
+- `WhatPercentageWordleIsLuck.tex` - IEEEtran format LaTeX kaynağı (İngilizce, conference template)
+- `WhatPercentageWordleIsLuck.pdf` - Derlenmiş PDF (5 sayfa)
+- `figures/` - İngilizce-etiketli PNG grafikler (`../scripts/plot_english.py` üretir; Türkçe versiyonlar `data/figures/` altında, docs/ için)
+- `Makefile` - Tek komutluk derleme
 
 ## Derleme
 
@@ -36,8 +36,8 @@ Inline `thebibliography` ortamı kullanılıyor (BibTeX yok). On beş referans:
 - Harris et al. 2020 (NumPy, Nature)
 - Hunter 2007 (Matplotlib, CSE)
 - Liang et al. 2024 (arXiv; semantic/orthographic biases in human Wordle play)
-- Göksel & Kerslake 2005 (Routledge; Turkish grammar — CVCVC syllable claim)
-- **Akbulut & Senturk 2026** (Entertainment Computing 57:101117; *önceki Türkçe Wordle çalışması* — LSTM/MaxEnt/rule-based solver karşılaştırması)
+- Göksel & Kerslake 2005 (Routledge; Turkish grammar - CVCVC syllable claim)
+- **Akbulut & Senturk 2026** (Entertainment Computing 57:101117; *önceki Türkçe Wordle çalışması* - LSTM/MaxEnt/rule-based solver karşılaştırması)
 - **Qiu & Zhong 2024** (HSW model, IOS Press; vokabüler-population modelinin parallel'i)
 - **Dilger 2023** (arXiv 2309.02110; İngilizce Wordle için ilk skill/luck info-theory analizi)
 
