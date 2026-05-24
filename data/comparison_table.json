@@ -1,0 +1,36 @@
+{
+  "entropy_bot_winrate": 1.0,
+  "frequency_bot_winrate": 0.9918256130790191,
+  "rows": [
+    {
+      "taban": "Saf rastgele\n(geri bildirim yok)",
+      "baseline_winrate": 0.0010217983651226157,
+      "sans_pct": 0.10217983651226158,
+      "beceri_pct": 99.89782016348774
+    },
+    {
+      "taban": "Gerçekçi insan\n(K=500, ~%26 vokab.)",
+      "baseline_winrate": 0.1699591280653951,
+      "sans_pct": 16.995912806539508,
+      "beceri_pct": 83.00408719346049
+    },
+    {
+      "taban": "Gerçekçi insan\n(K=1000, ~%48 vokab.)",
+      "baseline_winrate": 0.33923705722070846,
+      "sans_pct": 33.92370572207085,
+      "beceri_pct": 66.07629427792916
+    },
+    {
+      "taban": "Gerçekçi insan\n(K=2000, ~%85 vokab.)",
+      "baseline_winrate": 0.6713215258855586,
+      "sans_pct": 67.13215258855585,
+      "beceri_pct": 32.86784741144414
+    },
+    {
+      "taban": "Tutarlı rastgele\n(tam sözlük, strateji yok)",
+      "baseline_winrate": 0.9696866485013624,
+      "sans_pct": 96.96866485013625,
+      "beceri_pct": 3.0313351498637564
+    }
+  ]
+}
