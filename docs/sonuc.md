@@ -5,7 +5,7 @@
 > tabanları ve hangisinin neden gerçekçi olduğunu açıklıyoruz.
 >
 > **Gerçekçi insan oyuncusu için kısa cevap:**
-> **~%34 şans, ~%66 beceri** — ve bu "beceri"nin neredeyse tamamı (%66'nın
+> **~%34 şans, ~%66 beceri** - ve bu "beceri"nin neredeyse tamamı (%66'nın
 > %63'ü) **kelime bilgisi**, küçük bir kısmı (~%3) **strateji** (frekans/entropy
 > mantığı).
 
@@ -36,12 +36,12 @@
 ![Dört oyuncu tur histogramı](../data/figures/turn_breakdown.png)
 
 İlk yansıma: **entropy-bot tek bir oyunu bile kaybetmiyor**. Bu, "irreducible
-luck yok" anlamına geliyor — en azından bu kelime havuzunda. Demek ki teorik
+luck yok" anlamına geliyor - en azından bu kelime havuzunda. Demek ki teorik
 skill tavanı = %100.
 
 ---
 
-## Şans/beceri ayrıştırması — taban seçimi her şey
+## Şans/beceri ayrıştırması - taban seçimi her şey
 
 Aynı entropy-bot kazanımları (%100), farklı şans tabanlarıyla:
 
@@ -84,7 +84,7 @@ tanıyıp tanımamak*.
 
 ---
 
-## Hangi kelimeler "şans" oyunu — zorluk haritası
+## Hangi kelimeler "şans" oyunu - zorluk haritası
 
 Entropy-bot bile bazı kelimelerde 5. tura kadar gider:
 
@@ -107,8 +107,8 @@ kapak, kaçak, kucak, pembe, siğil, yassı, yağma, çizgi, şehir, şifon
 ```
 
 Bunların ortak özelliği: aynı kalıba sahip birçok yakın komşu (`KAPAK ↔ KAÇAK
-↔ KAVAK ↔ KAZAK` — hepsi K-A-?-A-K). Bot tek tek elemek zorunda; bu fazladan tur demek.
-**Günün cevabı bu ailelerden biriyse hem insan hem bot zorlanır — bu "şansın
+↔ KAVAK ↔ KAZAK` - hepsi K-A-?-A-K). Bot tek tek elemek zorunda; bu fazladan tur demek.
+**Günün cevabı bu ailelerden biriyse hem insan hem bot zorlanır - bu "şansın
 yapısal kaynağı".**
 
 ---
@@ -126,7 +126,7 @@ yapısal kaynağı".**
 
 Entropy-bot teorik tavanın ~%40'ında, ortalama insanın ise ~%34'ünde
 performans sergiliyor. Yani strateji tur başına %15-25 daha fazla bilgi
-sızdırıyor — küçük gibi görünür ama uzun vadede önemlidir.
+sızdırıyor - küçük gibi görünür ama uzun vadede önemlidir.
 
 ---
 
@@ -142,5 +142,4 @@ sızdırıyor — küçük gibi görünür ama uzun vadede önemlidir.
 ## Notlar
 
 - *Tüm hesaplama adımları için:* [`docs/hesaplama-defteri.md`](./hesaplama-defteri.md)
-- *Metodolojik özeleştiri:* [`docs/metodoloji-kritik.md`](./metodoloji-kritik.md)
 - *Ham veri ve sonuç dosyaları:* [`data/`](../data) klasöründe.

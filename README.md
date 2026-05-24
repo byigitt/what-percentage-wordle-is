@@ -1,4 +1,4 @@
-# Wordle Türkçe — Şans mı, Beceri mi?
+# Wordle Türkçe - Şans mı, Beceri mi?
 
 [wordleturkce.bundle.app](https://wordleturkce.bundle.app/) sitesinin kelime
 listesinden ve harf frekanslarından yola çıkarak şu soruyu cevaplayan bir araç:
@@ -7,7 +7,7 @@ listesinden ve harf frekanslarından yola çıkarak şu soruyu cevaplayan bir ar
 
 ## Kısa cevap
 
-Tek bir sayı yok — taban seçimine göre değişiyor:
+Tek bir sayı yok - taban seçimine göre değişiyor:
 
 | Şans tabanı | Şans % | Beceri % |
 |---|---:|---:|
@@ -25,9 +25,8 @@ küçük bir kısmı (~%3) **strateji** (frekans/entropy mantığı).
 
 | Doküman | Açıklama |
 |---|---|
-| 📄 [`docs/sonuc.md`](docs/sonuc.md) | Özet doküman — final cümlesi hazır |
+| 📄 [`docs/sonuc.md`](docs/sonuc.md) | Özet doküman - final cümlesi hazır |
 | 📓 [`docs/hesaplama-defteri.md`](docs/hesaplama-defteri.md) | Adım adım hesap defteri (15 adım) |
-| 🔍 [`docs/metodoloji-kritik.md`](docs/metodoloji-kritik.md) | Yöntem özeleştirisi ve iyileştirmeler |
 | 📚 [`paper/wordle-turkish.pdf`](paper/wordle-turkish.pdf) | IEEE format akademik makale (5 sayfa, İngilizce) |
 
 > Yazarın özel video script'i, indirilmiş Unsplash fotoğrafları ve Manim
@@ -64,7 +63,6 @@ data/                       ham veri + hesap çıktıları (JSON)
 docs/
   sonuc.md                  özet doküman
   hesaplama-defteri.md      adım adım hesap defteri
-  metodoloji-kritik.md      yöntem özeleştirisi ve iyileştirmeler
 paper/
   wordle-turkish.tex        IEEE LaTeX kaynağı
   wordle-turkish.pdf        derlenmiş PDF (IEEE conference format)
@@ -88,10 +86,10 @@ scripts/
 
 ## Önemli görseller
 
-- `data/figures/turn_breakdown.png` — Dört oyuncu modelinin tur histogramı
-- `data/figures/skill_decomposition.png` — Şans/beceri payları (5 taban)
-- `data/figures/k_vs_winrate.png` — Vokabüler büyüklüğüne göre kazanma eğrisi
-- `data/figures/difficulty_hist.png` — Entropy-bot'un tur dağılımı
+- `data/figures/turn_breakdown.png` - Dört oyuncu modelinin tur histogramı
+- `data/figures/skill_decomposition.png` - Şans/beceri payları (5 taban)
+- `data/figures/k_vs_winrate.png` - Vokabüler büyüklüğüne göre kazanma eğrisi
+- `data/figures/difficulty_hist.png` - Entropy-bot'un tur dağılımı
 
 ## Lisans
 
